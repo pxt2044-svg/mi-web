@@ -6,6 +6,27 @@
 <title>Para mi cumpleañera</title>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Pinyon+Script&display=swap" rel="stylesheet">
 <style>
+
+  .mi-reproductor-flotante {
+  position: absolute;
+  top: 15px;          /* Lo colocamos arriba para que no estorbe los botones de abajo */
+  left: 50%;
+  transform: translateX(-50%); /* Centrado exacto */
+  width: 90%;         /* Se adapta al ancho del móvil dejando margen */
+  max-width: 400px;   /* No será demasiado ancho en PC */
+  z-index: 100;       /* Asegura que flote por encima del libro */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5); /* Sombra para que destaque del fondo */
+}
+
+/* En móviles, reducimos un poco la altura del iframe para que no tape el libro */
+@media (max-width: 600px) {
+  .mi-reproductor-flotante iframe {
+    height: 130px !important; 
+  }
+}
+
 :root{
   --noche:#1b0e2e; --vino:#7e2452; --rosa:#f2a7c3; --oro:#f0cf8e; --papel:#fff4f0; --tinta:#4a2a3d;
   --w:min(40vw,42vh,360px); --h:calc(var(--w)*1.4);
@@ -140,9 +161,7 @@ const RECUERDOS = [
 ];
 const FINAL = "Gracias por existir. Te quiero muchísimo y esto es solo el principio. ❤";
 // Canción: enlace normal de SoundCloud (el de la barra del navegador)
-const CANCION_URL = "https://soundcloud.com/tainy-music/tainy-alvaro-diaz-paranormal";
-// Opcional: si prefieres un MP3 subido junto a este archivo, ponlo aquí (ej. "cancion.mp3") y tendrá prioridad
-const CANCION_MP3 = "";
+
 /* ============================================== */
 
 const libro = document.getElementById('libro'), escena = document.getElementById('escena');
@@ -254,7 +273,8 @@ function iniciarMusica(){
 addEventListener('load', iniciarMusica);
 ordenZ(0);
 </script>
-
-  <iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A1545481678&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/tainy-music" title="Tainy" target="_blank" style="color: #cccccc; text-decoration: none;">Tainy</a> · <a href="https://soundcloud.com/tainy-music/tainy-alvaro-diaz-paranormal" title="PARANORMAL" target="_blank" style="color: #cccccc; text-decoration: none;">PARANORMAL</a></div>
+<div class="mi-reproductor-flotante">
+  <iframe width="100%" height="150" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A1545481678&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>
+</div>
 </body>
 </html>
