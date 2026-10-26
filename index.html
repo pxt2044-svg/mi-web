@@ -7,25 +7,35 @@
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Pinyon+Script&display=swap" rel="stylesheet">
 <style>
 
-  .mi-reproductor-flotante {
+
+.mi-reproductor-flotante {
   position: absolute;
-  top: 15px;          /* Lo colocamos arriba para que no estorbe los botones de abajo */
+  top: 15px;
   left: 50%;
-  transform: translateX(-50%); /* Centrado exacto */
-  width: 90%;         /* Se adapta al ancho del móvil dejando margen */
-  max-width: 400px;   /* No será demasiado ancho en PC */
-  z-index: 100;       /* Asegura que flote por encima del libro */
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 400px;
+  z-index: 100;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.5); /* Sombra para que destaque del fondo */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  /* Animación suave de entrada y salida */
+  transition: opacity 0.6s ease, transform 0.6s ease; 
 }
 
-/* En móviles, reducimos un poco la altura del iframe para que no tape el libro */
-@media (max-width: 600px) {
-  .mi-reproductor-flotante iframe {
-    height: 130px !important; 
-  }
+/* Estado cuando no se toca la pantalla */
+.mi-reproductor-flotante.oculto {
+  opacity: 0;
+  pointer-events: none; /* Evita clics accidentales cuando es invisible */
+  transform: translate(-50%, -30px); /* Se desliza ligeramente hacia arriba */
 }
+
+@media (max-width: 600px) {
+  .mi-reproductor-flotante iframe { height: 130px !important; }
+}
+
+
+  
 
 :root{
   --noche:#1b0e2e; --vino:#7e2452; --rosa:#f2a7c3; --oro:#f0cf8e; --papel:#fff4f0; --tinta:#4a2a3d;
@@ -150,6 +160,28 @@ button:focus-visible{outline:2px solid #fff;outline-offset:3px}
 
 <script src="https://w.soundcloud.com/player/api.js"></script>
 <script>
+
+let inactividad;
+const reproFlotante = document.querySelector('.mi-reproductor-flotante');
+
+function reiniciarTemporizador() {
+  if (!reproFlotante) return;
+  
+  reproFlotante.classList.remove('oculto');
+  
+  clearTimeout(inactividad);
+  inactividad = setTimeout(() => {
+    reproFlotante.classList.add('oculto');
+  }, 4000); // 4000 milisegundos = 4 segundos
+}
+
+document.addEventListener('touchstart', reiniciarTemporizador, {passive: true});
+document.addEventListener('mousemove', reiniciarTemporizador);
+document.addEventListener('click', reiniciarTemporizador);
+
+reiniciarTemporizador();
+
+  
 /* ================= EDITA AQUÍ ================= */
 const TITULO = "Para mi cumpleañera";
 const DEDICATORIA = "Feliz cumpleaños, mi vida. Pasa las páginas y recuerda conmigo.";
