@@ -24,7 +24,7 @@ body{
 @keyframes brilla{0%,100%{opacity:.1;transform:scale(.6)}50%{opacity:1;transform:scale(1.6)}}
 
 /* Libro */
-.escena{perspective:1800px;position:relative;width:0;height:var(--h);left:0;margin-top:-4vh}
+.escena{perspective:1800px;position:relative;width:0;height:var(--h);left:0;margin-top:-4vh;transform-origin:0 50%;transition:transform 1.2s cubic-bezier(.45,.05,.25,1)}
 .libro{
   position:absolute;left:0;top:0;width:var(--w);height:var(--h);
   transform-style:preserve-3d;transform:translateX(0) rotateX(8deg);
@@ -94,17 +94,38 @@ body{
 .controles button:hover:not(:disabled){background:var(--vino);transform:scale(1.07)}
 .controles button:disabled{opacity:.3;cursor:default}
 .controles button:focus-visible{outline:2px solid #fff;outline-offset:3px}
+/* Reproductor */
+.reproductor{position:fixed;right:3vw;bottom:3vh;z-index:60;display:flex;align-items:center;gap:.6rem}
+.reproductor[hidden]{display:none}
+.disco{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;
+  background:conic-gradient(transparent 0 40deg,rgba(255,255,255,.16) 60deg,transparent 80deg 220deg,rgba(255,255,255,.16) 240deg,transparent 260deg),
+  repeating-radial-gradient(circle,#15091f 0 2px,#26123a 2px 4px);
+  box-shadow:0 0 0 2px var(--oro),0 6px 16px rgba(0,0,0,.5);
+  animation:gira 4s linear infinite;animation-play-state:paused}
+.disco span{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle,#1b0e2e 0 2px,var(--rosa) 3px)}
+.reproductor.sonando .disco{animation-play-state:running}
+@keyframes gira{to{transform:rotate(360deg)}}
+.reproductor button{width:44px;height:44px;border-radius:50%;font:1.1rem system-ui,sans-serif;color:var(--oro);
+  background:rgba(126,36,82,.55);border:1.5px solid var(--oro);cursor:pointer;transition:.2s}
+.reproductor button:hover{background:var(--vino);transform:scale(1.08)}
+.reproductor button:focus-visible{outline:2px solid #fff;outline-offset:3px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
 <body>
 
-<div class="escena"><div class="libro" id="libro"></div></div>
+<div class="escena" id="escena"><div class="libro" id="libro"></div></div>
 <div class="controles">
   <button id="atras" disabled>Anterior</button>
   <button id="sig">Abrir el libro</button>
 </div>
 
+<div class="reproductor" id="repro" hidden>
+  <div class="disco"><span></span></div>
+  <button id="play" aria-label="Reproducir música">▶</button>
+</div>
+
+<script src="https://w.soundcloud.com/player/api.js"></script>
 <script>
 /* ================= EDITA AQUÍ ================= */
 const TITULO   = "Para mi cumpleañera";
@@ -117,6 +138,8 @@ const RECUERDOS = [
   { src:"foto4.jpeg", texto:"Mi momento favorito, siempre a tu lado." },
 ];
 const FINAL = "Gracias por existir. Te quiero muchísimo y esto es solo el principio. ❤";
+// Pega aquí el enlace de la canción en SoundCloud (déjalo vacío "" para quitar el reproductor)
+const CANCION_URL = "https://soundcloud.com/usuario/nombre-de-la-cancion";
 /* ============================================== */
 
 const libro = document.getElementById('libro');
@@ -142,6 +165,23 @@ const els = [...document.querySelectorAll('.hoja')];
 const bAtras = document.getElementById('atras'), bSig = document.getElementById('sig');
 let pag = 0;
 
+/* Zoom: se acerca a la página al abrir y se aleja mientras se pasa de hoja */
+const escena = document.getElementById('escena');
+let zoomT, zoomado = false;
+function escala(){
+  const w = libro.offsetWidth, h = libro.offsetHeight;
+  return Math.max(1, Math.min(1.5, innerWidth*0.94/(2*w), innerHeight*0.72/h));
+}
+function zoom(on){
+  zoomado = on;
+  escena.style.transform = on ? `scale(${escala()})` : 'scale(1)';
+}
+function ciclo(){
+  clearTimeout(zoomT); zoom(false);
+  if(pag > 0) zoomT = setTimeout(()=>zoom(true), 1300);
+}
+addEventListener('resize',()=>{ if(zoomado) zoom(true); });
+
 function ordenZ(){
   els.forEach((e,i)=> e.style.zIndex = i < pag ? i+1 : els.length - i);
 }
@@ -152,6 +192,7 @@ function actualiza(){
   bSig.disabled = pag === els.length;
   bSig.textContent = pag === 0 ? 'Abrir el libro' : pag === els.length ? 'Fin 💖' : 'Siguiente';
   setTimeout(ordenZ, 450);
+  ciclo();
 }
 function siguiente(){
   if(pag >= els.length) return;
@@ -191,6 +232,27 @@ function confeti(n=40){
     setTimeout(()=>s.remove(), 1700);
   }
 }
+/* Música de SoundCloud: solo suena si se pulsa play */
+(function(){
+  if(!CANCION_URL || !window.SC) return;
+  const f = document.createElement('iframe');
+  f.allow = 'autoplay';
+  f.title = 'Canción';
+  f.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;border:0';
+  f.src = 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(CANCION_URL) + '&auto_play=false&visual=false&show_comments=false&hide_related=true';
+  document.body.appendChild(f);
+  const w = SC.Widget(f), repro = document.getElementById('repro'), btn = document.getElementById('play');
+  repro.hidden = false;
+  const ui = on => {
+    repro.classList.toggle('sonando', on);
+    btn.textContent = on ? '⏸' : '▶';
+    btn.setAttribute('aria-label', on ? 'Pausar música' : 'Reproducir música');
+  };
+  w.bind(SC.Widget.Events.PLAY, () => ui(true));
+  w.bind(SC.Widget.Events.PAUSE, () => ui(false));
+  w.bind(SC.Widget.Events.FINISH, () => { w.seek(0); w.play(); });
+  btn.onclick = () => w.toggle();
+})();
 ordenZ();
 </script>
 </body>
