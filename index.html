@@ -6,37 +6,6 @@
 <title>Para mi cumpleañera</title>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Pinyon+Script&display=swap" rel="stylesheet">
 <style>
-
-
-.mi-reproductor-flotante {
-  position: absolute;
-  top: 15px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  max-width: 400px;
-  z-index: 100;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-  /* Animación suave de entrada y salida */
-  transition: opacity 0.6s ease, transform 0.6s ease; 
-}
-
-/* Estado cuando no se toca la pantalla */
-.mi-reproductor-flotante.oculto {
-  opacity: 0;
-  pointer-events: none; /* Evita clics accidentales cuando es invisible */
-  transform: translate(-50%, -30px); /* Se desliza ligeramente hacia arriba */
-}
-
-@media (max-width: 600px) {
-  .mi-reproductor-flotante iframe { height: 130px !important; }
-}
-
-
-  
-
 :root{
   --noche:#1b0e2e; --vino:#7e2452; --rosa:#f2a7c3; --oro:#f0cf8e; --papel:#fff4f0; --tinta:#4a2a3d;
   --w:min(40vw,42vh,360px); --h:calc(var(--w)*1.4);
@@ -49,6 +18,31 @@ body{
   overflow:hidden;font-family:'Caveat',cursive;color:var(--papel);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
 }
+
+/* Reproductor Flotante */
+.mi-reproductor-flotante {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 400px;
+  z-index: 100;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  transition: opacity 0.6s ease, transform 0.6s ease; 
+}
+.mi-reproductor-flotante.oculto {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -30px);
+}
+@media (max-width: 600px) {
+  .mi-reproductor-flotante iframe { height: 130px !important; }
+}
+
+/* Animaciones fondo */
 .flota{position:fixed;bottom:-40px;pointer-events:none;animation:sube linear forwards;opacity:.8}
 @keyframes sube{to{transform:translateY(-110vh) rotate(40deg);opacity:0}}
 .estrella{position:fixed;width:3px;height:3px;border-radius:50%;background:var(--oro);animation:brilla 3s infinite ease-in-out}
@@ -97,7 +91,7 @@ body{
 .toca{font-size:1.1em;opacity:.85;animation:parpadea 2s infinite}
 @keyframes parpadea{50%{opacity:.35}}
 
-/* La foto ocupa el espacio que deja el texto, sea cual sea su tamaño */
+/* Fotos y texto */
 .foto{
   flex:1 1 0;min-height:0;width:90%;position:relative;background:#fff;
   box-shadow:0 4px 12px rgba(74,42,61,.3);transform:rotate(-1.6deg);
@@ -113,7 +107,7 @@ body{
 .saludo{font-family:'Pinyon Script',cursive;font-size:2.4em;color:var(--vino);text-align:center;line-height:1.1}
 .final{font-size:1.35em}
 
-/* Controles y reproductor */
+/* Controles */
 .controles{position:fixed;bottom:3vh;display:flex;gap:1rem;align-items:center;z-index:50}
 .controles button{
   font:700 1.3rem 'Caveat',cursive;color:var(--oro);background:rgba(126,36,82,.55);
@@ -121,68 +115,60 @@ body{
 }
 .controles button:hover:not(:disabled){background:var(--vino);transform:scale(1.07)}
 .controles button:disabled{opacity:.3;cursor:default}
-.reproductor{position:fixed;right:3vw;bottom:3vh;z-index:60;display:flex;align-items:center;gap:.6rem}
-.reproductor[hidden]{display:none}
-.disco{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;
-  background:conic-gradient(transparent 0 40deg,rgba(255,255,255,.16) 60deg,transparent 80deg 220deg,rgba(255,255,255,.16) 240deg,transparent 260deg),
-  repeating-radial-gradient(circle,#15091f 0 2px,#26123a 2px 4px);
-  box-shadow:0 0 0 2px var(--oro),0 6px 16px rgba(0,0,0,.5);
-  animation:gira 4s linear infinite;animation-play-state:paused}
-.disco span{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle,#1b0e2e 0 2px,var(--rosa) 3px)}
-.reproductor.sonando .disco{animation-play-state:running}
-@keyframes gira{to{transform:rotate(360deg)}}
-.reproductor button{width:44px;height:44px;border-radius:50%;font:1.1rem system-ui,sans-serif;color:var(--oro);
-  background:rgba(126,36,82,.55);border:1.5px solid var(--oro);cursor:pointer;transition:.2s}
-.reproductor button:hover{background:var(--vino);transform:scale(1.08)}
-button:focus-visible{outline:2px solid #fff;outline-offset:3px}
 
-/* Móvil */
 @media (max-aspect-ratio:1/1){
   .controles{left:3vw;gap:.5rem}
   .controles button{font-size:1.1rem;padding:.3em .9em}
-  .disco{width:46px;height:46px}.disco span{width:16px;height:16px}
-  .reproductor{gap:.4rem}.reproductor button{width:38px;height:38px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
 <body>
 
+<div class="mi-reproductor-flotante" id="flotante">
+  <!-- Se ha añadido #t=1m05s a la URL -->
+  <iframe id="sc-iframe" width="100%" height="150" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1545481678&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true#t=1m05s"></iframe>
+</div>
+
 <div class="escena" id="escena"><div class="libro" id="libro"></div></div>
 <div class="controles">
   <button id="atras" disabled>Anterior</button>
   <button id="sig">Abrir el libro</button>
 </div>
-<div class="reproductor" id="repro" hidden>
-  <div class="disco"><span></span></div>
-  <button id="play" aria-label="Reproducir música">▶</button>
-</div>
 
 <script src="https://w.soundcloud.com/player/api.js"></script>
 <script>
-
+/* ================= LÓGICA DEL REPRODUCTOR ================= */
 let inactividad;
-const reproFlotante = document.querySelector('.mi-reproductor-flotante');
+const reproFlotante = document.getElementById('flotante');
+const iframeElement = document.getElementById('sc-iframe');
+const widget = SC.Widget(iframeElement);
+let haSaltado = false;
+
+// Forzar el inicio en 1:05 (65000 ms) a través de la API
+widget.bind(SC.Widget.Events.PLAY, function() {
+  if (!haSaltado) {
+    widget.seekTo(65000); 
+    haSaltado = true;
+  }
+});
 
 function reiniciarTemporizador() {
   if (!reproFlotante) return;
-  
   reproFlotante.classList.remove('oculto');
-  
   clearTimeout(inactividad);
   inactividad = setTimeout(() => {
     reproFlotante.classList.add('oculto');
-  }, 4000); // 4000 milisegundos = 4 segundos
+  }, 4000);
 }
 
 document.addEventListener('touchstart', reiniciarTemporizador, {passive: true});
 document.addEventListener('mousemove', reiniciarTemporizador);
 document.addEventListener('click', reiniciarTemporizador);
-
 reiniciarTemporizador();
 
-  
-/* ================= EDITA AQUÍ ================= */
+
+/* ================= DATOS DEL LIBRO ================= */
 const TITULO = "Para mi cumpleañera";
 const DEDICATORIA = "Feliz cumpleaños, mi vida. Pasa las páginas y recuerda conmigo.";
 const RECUERDOS = [
@@ -192,10 +178,8 @@ const RECUERDOS = [
   { src:"foto4.jpeg", texto:"Mi momento favorito, siempre a tu lado." },
 ];
 const FINAL = "Gracias por existir. Te quiero muchísimo y esto es solo el principio. ❤";
-// Canción: enlace normal de SoundCloud (el de la barra del navegador)
 
-/* ============================================== */
-
+/* ================= MOTOR DEL LIBRO ================= */
 const libro = document.getElementById('libro'), escena = document.getElementById('escena');
 const tarjeta = r => `
   <div class="foto"><span class="cinta"></span>
@@ -215,17 +199,16 @@ libro.innerHTML = `<div class="cara base"><p class="saludo">Te quiero</p><p clas
 const els = [...document.querySelectorAll('.hoja')];
 const bAtras = document.getElementById('atras'), bSig = document.getElementById('sig');
 
-/* Pasos: 0 portada · 1 página izq. · 2 página der. · 3 izq. · 4 der. · 5 izq. · 6 der. (final) */
 const MAX = 6;
 let paso = 0, camT;
 const pagDe = p => p === 0 ? 0 : Math.ceil(p/2);
 
-function foco(){ // zoom centrado en UNA página
+function foco(){
   const w = libro.offsetWidth, h = libro.offsetHeight;
   const z = Math.min(innerWidth*.9/w, innerHeight*.72/h, 1.7);
   return `scale(${z}) translateX(${paso % 2 ? w/2 : -w/2}px)`;
 }
-function camara(volteo){ // se aleja y luego se acerca a la página nueva
+function camara(volteo){
   clearTimeout(camT);
   libro.classList.remove('cerca');
   if(paso === 0){ escena.style.transform = 'scale(1)'; return; }
@@ -275,38 +258,7 @@ for(let i=0;i<40;i++){
   s.style.animationDelay = Math.random()*3 + 's'; document.body.appendChild(s);
 }
 
-/* Música: solo suena al pulsar play */
-function iniciarMusica(){
-  const repro = document.getElementById('repro'), btn = document.getElementById('play');
-  const ui = on => {
-    repro.classList.toggle('sonando', on);
-    btn.textContent = on ? '⏸' : '▶';
-    btn.setAttribute('aria-label', on ? 'Pausar música' : 'Reproducir música');
-  };
-  if(CANCION_MP3){
-    const a = new Audio(CANCION_MP3); a.loop = true;
-    a.onplay = () => ui(true); a.onpause = () => ui(false);
-    btn.onclick = () => a.paused ? a.play() : a.pause();
-    repro.hidden = false; return;
-  }
-  if(!CANCION_URL || !window.SC) return;
-  const f = document.createElement('iframe');
-  f.allow = 'autoplay'; f.title = 'Canción';
-  f.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;border:0';
-  f.src = 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(CANCION_URL) + '&auto_play=false&visual=false&show_comments=false&hide_related=true';
-  document.body.appendChild(f);
-  const w = SC.Widget(f);
-  w.bind(SC.Widget.Events.PLAY, () => ui(true));
-  w.bind(SC.Widget.Events.PAUSE, () => ui(false));
-  w.bind(SC.Widget.Events.FINISH, () => { w.seek(0); w.play(); });
-  btn.onclick = () => w.toggle();
-  repro.hidden = false;
-}
-addEventListener('load', iniciarMusica);
 ordenZ(0);
 </script>
-<div class="mi-reproductor-flotante">
-  <iframe width="100%" height="150" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A1545481678&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>
-</div>
 </body>
 </html>
